@@ -1,0 +1,21 @@
+import streamlit as st
+import numpy as np
+import pickle
+
+# Load model and scaler
+model = pickle.load(open("xgb_model.pkl", "rb"))
+scaler = pickle.load(open("scaler.pkl", "rb"))
+
+st.title("Diabetes Risk Prediction")
+
+fields = ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness",
+          "Insulin", "BMI", "DiabetesPedigreeFunction", "Age"]
+
+# Get user input
+values = [st.number_input(f, step=1.0) for f in fields]
+
+if st.button("Predict"):
+    X_input = np.array(values).reshape(1, -1)
+    X_scaled = scaler.transform(X_input)
+    prediction = model.predict(X_scaled)[0]
+    st.success("High Risk of Diabetes" if prediction == 1 else "Low Risk of Diabetes")
